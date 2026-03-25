@@ -15,7 +15,10 @@ mode = st.selectbox(
 
 uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
 
-if uploaded_file is not None:
+if uploaded_file is None:
+    st.warning("Please upload a PDF first")
+
+else:
     with open("temp.pdf", "wb") as f:
         f.write(uploaded_file.read())
 
