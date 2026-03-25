@@ -14,11 +14,6 @@ mode = st.selectbox(
 )
 
 uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
 
 if uploaded_file is not None:
     with open("temp.pdf", "wb") as f:
@@ -33,37 +28,35 @@ if uploaded_file is not None:
     embeddings = HuggingFaceEmbeddings()
     db = FAISS.from_documents(docs, embeddings)
 
-    st.write("Document ready. Ask a question below 👇")
+    query = st.chat_input("Ask something about the document...")
 
-  
-query = st.chat_input("Ask something about the document...")
-if query:
-    st.session_state.messages.append({"role": "user", "content": query})
+    if query:
+        st.session_state.messages.append({"role": "user", "content": query})
 
-    with st.chat_message("user"):
-        st.write(query)
+        with st.chat_message("user"):
+            st.write(query)
 
-    results = db.similarity_search(query)
-    context = " ".join([doc.page_content for doc in results])
+        results = db.similarity_search(query)
+        context = " ".join([doc.page_content for doc in results])
 
-    generator = pipeline("text-generation", model="google/flan-t5-small")
+        generator = pipeline("text-generation", model="google/flan-t5-small")
 
-    if mode == "Ask Question":
-        prompt = f"Answer clearly based on the document:\n{context}\n\nQuestion: {query}"
+        if mode == "Ask Question":
+            prompt = f"Answer clearly based on the document:\n{context}\n\nQuestion: {query}"
 
-    elif mode == "Summarize":
-        prompt = f"Give a short and clear summary of this document:\n{context}"
+        elif mode == "Summarize":
+            prompt = f"Give a short and clear summary of this document:\n{context}"
 
-    elif mode == "Get Insights":
-        prompt = f"Explain the key insights and implications from this document in simple words:\n{context}"
+        elif mode == "Get Insights":
+            prompt = f"Explain the key insights and implications from this document in simple words:\n{context}"
 
-    result = generator(prompt, max_length=200)
-    answer = result[0]["generated_text"]
+        result = generator(prompt, max_length=200)
+        answer = result[0]["generated_text"]
 
-    with st.chat_message("assistant"):
-        st.write(answer)
+        with st.chat_message("assistant"):
+            st.write(answer)
 
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": answer
-    })
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": answer
+        })
