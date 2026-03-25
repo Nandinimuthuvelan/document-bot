@@ -35,8 +35,8 @@ if uploaded_file is not None:
 
     st.write("Document ready. Ask a question below 👇")
 
-    query = st.chat_input("Ask something about the document...")
-
+  
+query = st.chat_input("Ask something about the document...")
 if query:
     st.session_state.messages.append({"role": "user", "content": query})
 
