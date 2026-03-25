@@ -27,6 +27,9 @@ else:
 
     splitter = CharacterTextSplitter(chunk_size=800, chunk_overlap=100)
     docs = splitter.split_documents(documents)
+    if len(docs) == 0:
+    st.error("No content found in the PDF. Please upload a valid file.")
+    st.stop()
 
     embeddings = HuggingFaceEmbeddings()
     db = FAISS.from_documents(docs, embeddings)
